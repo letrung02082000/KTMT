@@ -83,16 +83,16 @@ void ScanQInt(QInt& x) {
 	x.data[3] = 0;
 
 	int bit[128];
-	string num, s;
+	string s, check;
 	cout << "Nhap QInt: ";
-	cin >> num;
-	if (num[0] == '-') {
+	cin >> s;
+	check = s;
+	if (s[0] == '-') {
 		bit[0] = 1;
-		s = num.erase(0, 1);
+		s.erase(0, 1);
 	}
 	else {
 		bit[0] = 0;
-		s = num;
 	}
 	while (s != "0") {
 		for (int i = 0; i < 127; ++i) {
@@ -106,7 +106,7 @@ void ScanQInt(QInt& x) {
 			s = Div2(s);
 		}
 	}
-	if (num[0] == '-') {
+	if (check[0] == '-') {
 
 		//bu 1
 		for (int i = 1; i < 128; ++i) {
@@ -223,6 +223,84 @@ int add(int int1[], int size1, int int2[], int size2) {
 	return size;
 }
 
+int global_compare;
+
+int sub(int int1[], int size1, int int2[], int size2) {
+	int compare = 0;
+	if (size1 < size2) {
+		compare = -1;
+	}
+	else if(size1 > size2) {
+		compare = 1;
+	}
+	for (int i = 0; i < size1; ++i) {
+		if (int1[size1 - 1 - i] < int2[size1 - 1 - i]) {
+			compare = -1;
+			break;
+		}
+		else if((int1[size1 - 1 - i] > int2[size1 - 1 - i])){
+			compare = 1;
+			break;
+		}
+	}
+	int size = 0;
+	global_compare = compare;
+	if (compare == -1) {
+		int carry = 0;
+		size = size2;
+		for (int i = 0; i < size1; ++i) {
+			int sub = (int2[i] - int1[i] - carry);
+			if (sub < 0) {
+				sub += 10;
+				carry = 1;
+			}
+			else { carry = 0; }
+			int1[i] = sub;
+		}
+		for (int i = size1; i < size2; ++i) {
+			int sub = int2[i] - carry;
+			if (sub < 0) {
+				sub += 10;
+				carry = 1;
+			}
+			else {
+				carry = 0;
+			}
+			int1[i] = sub;
+		}
+	}
+	else if (compare == 1) {
+		int carry = 0;
+		size = size1;
+		for (int i = 0; i < size2; ++i) {
+			int sub = (int1[i] - int2[i] - carry);
+			if (sub < 0) {
+				sub += 10;
+				carry = 1;
+			}
+			else { carry = 0; }
+			int1[i] = sub;
+		}
+		for (int i = size2; i < size1; ++i) {
+			int sub = int1[i] - carry;
+			if (sub < 0) {
+				sub += 10;
+				carry = 1;
+			}
+			else {
+				carry = 0;
+			}
+			int1[i] = sub;
+		}
+	}
+	else if (compare == 0) {
+		for (int i = 0; i < size1; ++i) {
+			int1[i] = 0;
+		}
+	}
+	return size;
+}
+
 void PrintQInt(QInt x) {
 	int bit[128];
 	int sum[39];
@@ -230,16 +308,42 @@ void PrintQInt(QInt x) {
 	for (int i = 0; i < 39; ++i) {
 		sum[i] = 0;
 	}
+	for (int i = 0; i < 39; ++i) {
+		temp[i] = 0;
+	}
 	for (int i = 0; i < 128; ++i) {
 		bit[i] = GetBit(x.data[i / 32], i % 32);
 	}
-	for (int i = 0; i < 128; ++i) {
-		if (bit[i] == 1) {
-			int size = power(temp, 2, 127 - i);
-			add(sum, 39, temp, size);
+	if (bit[0] == 0) {
+		for (int i = 0; i < 128; ++i) {
+			if (bit[i] == 1) {
+				int size = power(temp, 2, 127 - i);
+				add(sum, 39, temp, size);
+			}
+		}
+		for (int i = 0; i < 39; ++i) {
+			cout << sum[38 - i];
 		}
 	}
-	for (int i = 0; i < 39; ++i) {
-		cout << sum[38 - i];
+	else {
+		int size2;
+		int temp1[39];
+		for (int i = 0; i < 39; ++i) {
+			temp1[i] = 0;
+		}
+		int size1 = power(temp1, 2, 127);
+		for (int i = 1; i < 128; ++i) {
+			if (bit[i] == 1) {
+				int size_temp = power(temp, 2, 127 - i);
+				size2 = add(sum, 39, temp, size_temp);
+			}
+		}
+		sub(temp1, size1, sum, size2);
+		if (global_compare == 1) cout << "-";
+		for (int i = 0; i < 39; ++i) {
+			cout << temp1[38 - i];
+		}
 	}
+	
+	
 }
