@@ -1,8 +1,9 @@
-#include<iostream>
-using namespace std;
+#include"QInt.h"
 
 int main() {
-
+	QInt x;
+	ScanQInt(x);
+	PrintQInt(x);
 	system("pause");
 	return 0;
 }
