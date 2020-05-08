@@ -159,8 +159,8 @@ int multiply(int x, int result[], int size) {
 	}
 	while (carry) {
 		result[size] = carry % 10;
-		carry /= 10;
-		size++;
+		carry = carry / 10;
+		++size;
 	}
 	return size;
 }
@@ -227,6 +227,9 @@ void PrintQInt(QInt x) {
 	int bit[128];
 	int sum[39];
 	int temp[39];
+	for (int i = 0; i < 39; ++i) {
+		sum[i] = 0;
+	}
 	for (int i = 0; i < 128; ++i) {
 		bit[i] = GetBit(x.data[i / 32], i % 32);
 	}
